@@ -16,7 +16,7 @@ class SProducts extends StatelessWidget {
   }
 }
 
-// can be outsourced
+// can be outsourced to new Widget
 class ProductsGrid extends StatelessWidget {
   const ProductsGrid({
     Key key,
@@ -24,7 +24,7 @@ class ProductsGrid extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final products = Provider.of<PProducts>(context).items;
+    final products = Provider.of<PProducts>(context).items;  // gets values from Provider
 
     return GridView.builder(
       padding: const EdgeInsets.all(10),
@@ -36,7 +36,7 @@ class ProductsGrid extends StatelessWidget {
       ),
       itemCount: products.length,
       itemBuilder: (ctx, index){
-        return WProduct(products[index]);
+        return WProduct(products[index].id);
       },
     );
   }

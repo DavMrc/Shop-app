@@ -10,6 +10,12 @@ class PProducts with ChangeNotifier{
     return [..._products];  // ritorna una copia, NON l'oggetto stesso
   }
 
+  Product findById(String id){
+    return this._products.firstWhere((prod){
+      return id == prod.id;
+    });
+  }
+
   void addProduct(Product p){
     this._products.add(p);
 
