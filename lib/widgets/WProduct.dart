@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../screens/SProductDetail.dart';
 import '../models/product.dart';
 
 class WProduct extends StatelessWidget {
@@ -13,9 +14,14 @@ class WProduct extends StatelessWidget {
       borderRadius: BorderRadius.circular(10),
       child: GridTile(
         header: null,
-        child: Image.network(
-          _product.imageUrl,
-          fit: BoxFit.cover,
+        child: GestureDetector(
+          onTap: () => Navigator.of(context).pushNamed(
+            SProductDetail.routeName, arguments: this._product
+          ),
+          child: Image.network(
+            _product.imageUrl,
+            fit: BoxFit.cover,
+          ),
         ),
         footer: GridTileBar(
           backgroundColor: Colors.black87,

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import './screens/SProductDetail.dart';
 import './screens/SProducts.dart';
 
 void main() => runApp(MyApp());
@@ -16,6 +17,7 @@ class MyApp extends StatelessWidget {
       ),
       routes: {
         '/': (_) => SProducts(),
+        SProductDetail.routeName: (_) => SProductDetail(),
       },
     );
   }
