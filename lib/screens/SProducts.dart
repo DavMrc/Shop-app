@@ -1,30 +1,84 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:shopapp/providers/product.dart';
 
 import '../providers/PProducts.dart';
-import '../widgets/WProduct.dart';
+import '../widgets/ProductGridTile.dart';
 
-class SProducts extends StatelessWidget {
+enum FilterOptions{
+  favorites,
+  all,
+}
+
+class SProducts extends StatefulWidget {
+  @override
+  _SProductsState createState() => _SProductsState();
+}
+
+class _SProductsState extends State<SProducts> {
+  bool _showFavorites = false;
+
+  void showFavorites(){
+    setState(() {
+      this._showFavorites = true;
+    });
+  }
+
+  void showAll(){
+    setState(() {
+      this._showFavorites = false;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text("My products"),
+        actions: <Widget>[
+          PopupMenuButton(
+            icon: Icon(Icons.more_vert),
+            onSelected: (FilterOptions option){
+              if(option == FilterOptions.favorites){
+                this.showFavorites();
+              }else{
+                this.showAll();
+              }
+            },
+            itemBuilder: (_) => [
+              PopupMenuItem(
+                child: Text("Only favorites"),
+                value: FilterOptions.favorites,
+              ),
+              PopupMenuItem(
+                child: Text("Show all"),
+                value: FilterOptions.all,
+              ),
+            ]
+          )
+        ],
       ),
-      body: ProductsGrid(),
+
+      body: ProductsGrid(this._showFavorites),
     );
   }
 }
 
-// can be outsourced to new Widget
+
 class ProductsGrid extends StatelessWidget {
-  const ProductsGrid({
-    Key key,
-  }) : super(key: key);
+  bool showFavorites;
+
+  ProductsGrid(this.showFavorites);
 
   @override
   Widget build(BuildContext context) {
-    final products = Provider.of<PProducts>(context).items;  // gets values from Provider
+    List<Product> products;
+
+    if(this.showFavorites){
+      products = Provider.of<PProducts>(context).favorites;
+    }else{
+      products = Provider.of<PProducts>(context).all;
+    }
 
     return GridView.builder(
       padding: const EdgeInsets.all(10),
@@ -36,7 +90,10 @@ class ProductsGrid extends StatelessWidget {
       ),
       itemCount: products.length,
       itemBuilder: (ctx, index){
-        return WProduct(products[index].id);
+        return ChangeNotifierProvider.value(
+          value: products[index],
+          child: ProductGridTile(),
+        );
       },
     );
   }
