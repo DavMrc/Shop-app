@@ -1,17 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import './screens/SProductDetail.dart';
-import './screens/SProducts.dart';
-import './providers/PProducts.dart';
+import './screens/screens.dart';
+import './providers/providers.dart';
 
 void main() => runApp(MyApp());
 
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider(    // products provider
-      create: (ctx) => PProducts(),    // provider registered
+    return MultiProvider(    
+    providers: [
+      ChangeNotifierProvider(  // products provider registered
+        create: (ctx) => PProducts(),
+      ),
+      ChangeNotifierProvider(  // cart provider registered
+        create: (ctx) => PCart(),
+      ),
+    ],  
       child: MaterialApp(
         title: 'MyShop',
         theme: ThemeData(

@@ -2,13 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../screens/SProductDetail.dart';
-import '../providers/product.dart';
+import '../providers/providers.dart';
 
 class ProductGridTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
     Product product = Provider.of<Product>(context);
+    PCart cart = Provider.of<PCart>(context, listen: false);
 
     return ClipRRect(
       borderRadius: BorderRadius.circular(10),
@@ -38,7 +39,7 @@ class ProductGridTile extends StatelessWidget {
           trailing: IconButton(
             color: Theme.of(context).accentColor,
             icon: Icon(Icons.shopping_cart),
-            onPressed: (){},
+            onPressed: () => cart.addItem(product.id, product.title, product.price),
           ),
         ),
       ),
