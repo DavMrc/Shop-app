@@ -62,4 +62,16 @@ class PCart with ChangeNotifier{
 
     return total;
   }
+
+  void removeItem(String productId){
+    this._items.remove(productId);
+
+    notifyListeners();
+  }
+
+  void clear(){
+    this._items.clear();
+
+    notifyListeners();
+  }
 }

@@ -1,3 +1,5 @@
+import 'dart:ffi';
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -57,6 +59,12 @@ class SCart extends StatelessWidget {
           ),
 
         ],
+      ),
+
+      floatingActionButton: FloatingActionButton(
+        onPressed: () => cartProvider.clear(),
+        child: Icon(Icons.delete),
+        backgroundColor: Theme.of(context).errorColor,
       ),
     );
   }
