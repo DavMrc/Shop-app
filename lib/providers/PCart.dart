@@ -13,6 +13,10 @@ class CartItem{
     @required this.price,
     this.quantity = 1,
   });
+
+  String toString() {
+    return "CartItem #"+this.id;
+  }
 }
 
 
@@ -28,7 +32,7 @@ class PCart with ChangeNotifier{
       this._items[_id].quantity ++;
     }else{
       var newItem =  CartItem(
-        id: DateTime.now().toString(),
+        id: _id,
         title:  _title,
         price: _price,
         quantity: 1,
@@ -48,5 +52,14 @@ class PCart with ChangeNotifier{
     }
 
     return count;
+  }
+
+  double get totalPrice{
+    var total = 0.0;
+    this._items.forEach((key, value){
+      total += value.price * value.quantity;
+    });
+
+    return total;
   }
 }

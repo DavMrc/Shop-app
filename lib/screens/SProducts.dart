@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../providers/providers.dart';
+import './SCart.dart';
 import '../widgets/Badge.dart';
 import '../widgets/ProductGridTile.dart';
 
@@ -64,7 +65,7 @@ class _SProductsState extends State<SProducts> {
             ),
             child: IconButton(
               icon: Icon(Icons.shopping_cart),
-              onPressed: () {},
+              onPressed: () => Navigator.of(context).pushNamed(SCart.routeName),
             ),
           ),
         ],

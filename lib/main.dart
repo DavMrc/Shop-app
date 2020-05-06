@@ -28,6 +28,7 @@ class MyApp extends StatelessWidget {
         routes: {
           '/': (_) => SProducts(),
           SProductDetail.routeName: (_) => SProductDetail(),
+          SCart.routeName: (_) => SCart(),
         },
       ),
     );
