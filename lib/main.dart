@@ -17,6 +17,9 @@ class MyApp extends StatelessWidget {
       ChangeNotifierProvider(  // cart provider registered
         create: (ctx) => PCart(),
       ),
+      ChangeNotifierProvider(
+        create: (_) => POrders(),
+      )
     ],  
       child: MaterialApp(
         title: 'MyShop',
@@ -29,6 +32,7 @@ class MyApp extends StatelessWidget {
           '/': (_) => SProducts(),
           SProductDetail.routeName: (_) => SProductDetail(),
           SCart.routeName: (_) => SCart(),
+          SOrders.routeName: (_) => SOrders(),
         },
       ),
     );

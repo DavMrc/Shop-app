@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 
 import '../providers/providers.dart';
 import './SCart.dart';
+import '../widgets/Drawer.dart';
 import '../widgets/Badge.dart';
 import '../widgets/ProductGridTile.dart';
 
@@ -70,6 +71,8 @@ class _SProductsState extends State<SProducts> {
           ),
         ],
       ),
+      
+      drawer: WDrawer(),
 
       body: ProductsGrid(this._showFavorites),
     );

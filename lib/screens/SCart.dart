@@ -39,7 +39,13 @@ class SCart extends StatelessWidget {
                   FlatButton(
                     child: Text("Order now"),
                     textColor: Theme.of(context).primaryColor,
-                    onPressed: (){},
+                    onPressed: () {
+                      Provider.of<POrders>(context, listen: false).addOrder(
+                        cartProvider.items.values.toList()
+                      );
+
+                      cartProvider.clear();
+                    },
                   ),
                 ],
               ),
