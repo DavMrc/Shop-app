@@ -12,17 +12,20 @@ class SNewProduct extends StatefulWidget {
 }
 
 class _SNewProductState extends State<SNewProduct> {
+  bool _isInit = true;
+  bool _isEditMode = false;
   final _priceFocusNode = FocusNode();
   final _descriptionFocusNode = FocusNode();
   final _imageURLController = TextEditingController();
   final _imageURLFocusNode = FocusNode();
   final _formKey = GlobalKey<FormState>();
   var _tempProduct = {
-    'id': null,
-    'title': "",
-    'description': "",
-    'price': 0.0,
-    'imageUrl': ""
+    'id': '',
+    'title': '',
+    'description': '',
+    'price': '-1',
+    'imageUrl': '',
+    'favorite': false,
   };
 
   @override
@@ -33,12 +36,33 @@ class _SNewProductState extends State<SNewProduct> {
   }
 
   @override
+  void didChangeDependencies() {
+    if(this._isInit){
+      final editProductId = ModalRoute.of(context).settings.arguments;
+      if (editProductId != null){
+        this._isEditMode = true;
+        Product product = Provider.of<PProducts>(context).findById(editProductId);
+
+        this._tempProduct['id'] = product.id;
+        this._tempProduct['title'] = product.title;
+        this._tempProduct['description'] = product.description;
+        this._tempProduct['price'] = product.price.toStringAsFixed(2);
+        this._tempProduct['favorite'] = product.isFavorite;
+        this._imageURLController.text = product.imageUrl;
+      }
+    }
+    this._isInit = false;
+
+    super.didChangeDependencies();
+  }
+
+  @override
   void dispose() {
     this._priceFocusNode.dispose();
     this._descriptionFocusNode.dispose();
     this._imageURLController.dispose();
-    this._imageURLFocusNode.dispose();
     this._imageURLFocusNode.removeListener(this._updateImageURL);
+    this._imageURLFocusNode.dispose();
     
     super.dispose();
   }
@@ -70,16 +94,27 @@ class _SNewProductState extends State<SNewProduct> {
     this._formKey.currentState.save();  // triggers every input.onSaved method
     var productProvider = Provider.of<PProducts>(ctx, listen: false);
 
-    Product product = Product(
-      id: "p${productProvider.all.length}",
-      description: this._tempProduct['description'],
-      imageUrl: this._tempProduct['imageUrl'],
-      price: this._tempProduct['price'],
-      title: this._tempProduct['title'],
-    );
-
-    productProvider.addProduct(product);
-    productProvider.dispose();
+    if(this._isEditMode){
+      Product product = Product(
+        id: this._tempProduct['id'],
+        description: this._tempProduct['description'],
+        imageUrl: this._tempProduct['imageUrl'],
+        price: double.parse(this._tempProduct['price']),
+        title: this._tempProduct['title'],
+        isFavorite: this._tempProduct['favorite'],
+      );
+      productProvider.editProduct(product);
+    }
+    else{
+      Product product = Product(
+        id: "p${productProvider.all.length}",
+        description: this._tempProduct['description'],
+        imageUrl: this._tempProduct['imageUrl'],
+        price: double.parse(this._tempProduct['price']),
+        title: this._tempProduct['title'],
+      );
+      productProvider.addProduct(product);
+    }
   }
 
   @override
@@ -103,6 +138,7 @@ class _SNewProductState extends State<SNewProduct> {
             child: Column(
               children: <Widget>[
                 TextFormField(
+                  initialValue: this._tempProduct['title'],
                   decoration: InputDecoration(labelText: "Title",),
                   textInputAction: TextInputAction.next,  // shows "->" on softkey
                   onFieldSubmitted: (_) => FocusScope.of(context).requestFocus(this._priceFocusNode),
@@ -111,16 +147,18 @@ class _SNewProductState extends State<SNewProduct> {
                 ),
 
                 TextFormField(
+                  initialValue: this._tempProduct['price'] != '-1' ? this._tempProduct['price'] : '',
                   decoration: InputDecoration(labelText: "Price",),
                   keyboardType: TextInputType.number,
                   textInputAction: TextInputAction.next,
                   focusNode: this._priceFocusNode,
                   onFieldSubmitted: (_) => FocusScope.of(context).requestFocus(this._descriptionFocusNode),
-                  onSaved: (value) => this._tempProduct['price'] = double.parse(value),
+                  onSaved: (value) => this._tempProduct['price'] = value,
                   validator: (value) => this._validateInput(value, 'price'),
                 ),
 
                 TextFormField(
+                  initialValue: this._tempProduct['description'],
                   decoration: InputDecoration(labelText: "Description",),
                   keyboardType: TextInputType.multiline,
                   maxLines: 3,
@@ -158,7 +196,7 @@ class _SNewProductState extends State<SNewProduct> {
                           textInputAction: TextInputAction.done,
                           controller: this._imageURLController,
                           focusNode: this._imageURLFocusNode,
-                          onFieldSubmitted: (_) => this._saveForm(context),
+                          // onFieldSubmitted: (_) => this._saveForm(context),
                           onSaved: (value) => this._tempProduct['imageUrl'] = value,
                           validator: (value) => this._validateInput(value, 'imageUrl'),
                         ),
@@ -172,6 +210,12 @@ class _SNewProductState extends State<SNewProduct> {
         ),
       ),
 
+      resizeToAvoidBottomPadding: false,  // button stays under softkey
+      floatingActionButton: FloatingActionButton(
+        backgroundColor: Colors.green,
+        child: Icon(Icons.save),
+        onPressed: () => this._saveForm(context),
+      ),
     );
   }
 }

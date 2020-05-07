@@ -86,5 +86,14 @@ class PProducts with ChangeNotifier{
 
   void removeProduct(String id){
     this._products.removeWhere((prod) => prod.id == id);
+
+    notifyListeners();
+  }
+
+  void editProduct(Product product){
+    final prodIndex = this._products.indexWhere((p) => p.id == product.id);
+    this._products[prodIndex] = product;
+
+    notifyListeners();
   }
 }

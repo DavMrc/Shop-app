@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../providers/PProducts.dart';
+import '../screens/SNewProduct.dart';
 
 
 class WUserProductItem extends StatelessWidget {
@@ -57,7 +58,12 @@ class WUserProductItem extends StatelessWidget {
             trailing: IconButton(
               icon: Icon(Icons.edit),
               color: Theme.of(context).primaryColor,
-              onPressed: (){},
+              onPressed: () {
+                Navigator.of(context).pushNamed(
+                  SNewProduct.routeName,
+                  arguments: this._product.id
+                );
+              },
             ),
           ),
         ),

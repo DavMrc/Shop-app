@@ -28,7 +28,7 @@ class SProductDetail extends StatelessWidget {
             SizedBox(height: 10,),
 
             Text(
-              "${product.price}€",
+              "${product.price.toStringAsFixed(2)}€",
               style: TextStyle(
                 fontSize: 20,
                 color: Colors.grey,
