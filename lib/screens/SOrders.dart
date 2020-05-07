@@ -2,6 +2,7 @@ import "package:flutter/material.dart";
 import 'package:provider/provider.dart';
 
 import '../widgets/WOrder.dart';
+import '../widgets/Drawer.dart';
 import '../providers/providers.dart';
 
 class SOrders extends StatelessWidget {
@@ -12,6 +13,7 @@ class SOrders extends StatelessWidget {
     final ordersProvider = Provider.of<POrders>(context);
     return Scaffold(
       appBar: AppBar(title: Text("Your orders"),),
+      drawer: WDrawer(),
       body: ListView.builder(
         itemCount: ordersProvider.orders.length,
         itemBuilder: (ctx, index){

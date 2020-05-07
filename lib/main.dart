@@ -33,6 +33,8 @@ class MyApp extends StatelessWidget {
           SProductDetail.routeName: (_) => SProductDetail(),
           SCart.routeName: (_) => SCart(),
           SOrders.routeName: (_) => SOrders(),
+          SUserProducts.routeName: (_) => SUserProducts(),
+          SNewProduct.routeName: (_) => SNewProduct(),
         },
       ),
     );

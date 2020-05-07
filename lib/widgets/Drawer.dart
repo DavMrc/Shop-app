@@ -24,7 +24,15 @@ class WDrawer extends StatelessWidget {
            ListTile(
             leading: Icon(Icons.payment),
             title: Text("Orders"),
-            onTap: () => Navigator.of(context).pushNamed(SOrders.routeName),
+            onTap: () => Navigator.of(context).pushReplacementNamed(SOrders.routeName),
+          ),
+
+          Divider(),
+
+          ListTile(
+            leading: Icon(Icons.edit),
+            title: Text("Manage products"),
+            onTap: () => Navigator.of(context).pushReplacementNamed(SUserProducts.routeName),
           ),
         ],
       ),
