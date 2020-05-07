@@ -15,15 +15,26 @@ class WCartItem extends StatelessWidget {
       background: Container(
         padding: EdgeInsets.only(right: 20),
         color: Theme.of(context).errorColor,
-        child: Icon(
-          Icons.delete,
-          color: Colors.white,
-          size: 40,
-        ),
+        child: Icon(Icons.delete, color: Colors.white, size: 40,),
         alignment: Alignment.centerRight,
       ),
       direction: DismissDirection.endToStart,
       onDismissed: (_) => Provider.of<PCart>(context, listen: false).removeItem(this._cartItem.id),
+      confirmDismiss: (_){
+        return showDialog(
+          context: context,
+          builder: (_) {
+            return AlertDialog(  // mostra un widget di conferma Y/N
+              title: Text("Warning"),
+              content: Text("Do you want to remove the item from the cart?"),
+              actions: <Widget>[
+                FlatButton(child: Text("No"), onPressed: () => Navigator.of(context).pop(false),),
+                FlatButton(child: Text("Yes"), onPressed: () => Navigator.of(context).pop(true),),
+              ],
+            );
+          }
+        );
+      },
 
       child: Card(
         margin: const EdgeInsets.symmetric(vertical: 5, horizontal: 15),

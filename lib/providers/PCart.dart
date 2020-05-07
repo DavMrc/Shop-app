@@ -63,8 +63,12 @@ class PCart with ChangeNotifier{
     return total;
   }
 
-  void removeItem(String productId){
-    this._items.remove(productId);
+  void removeItem(String productId, {int quantity=-1}){
+    var prod = this._items[productId];
+    if(quantity == -1 || prod.quantity >= quantity) this._items.remove(productId);
+    else{
+      prod.quantity -= quantity;
+    }
 
     notifyListeners();
   }

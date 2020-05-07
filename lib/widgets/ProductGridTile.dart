@@ -41,6 +41,20 @@ class ProductGridTile extends StatelessWidget {
             icon: Icon(Icons.shopping_cart),
             onPressed: () {
               cart.addItem(product.id, product.title, product.price);
+              
+              Scaffold.of(context).hideCurrentSnackBar();
+              Scaffold.of(context).showSnackBar(
+                SnackBar(
+                  content: Text("Product added"),
+                  duration: Duration(seconds: 2),
+                  action: SnackBarAction(
+                    label: "Remove",
+                    onPressed: () => cart.removeItem(product.id),
+                  ),
+                  behavior: SnackBarBehavior.floating,
+
+                ),
+              );
             },
           ),
         ),
