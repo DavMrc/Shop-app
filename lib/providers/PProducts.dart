@@ -64,40 +64,6 @@ class PProducts with ChangeNotifier{
   static const prodsURL = "https://flutter-shop-6f582.firebaseio.com/products";
 
   List<Product> _products = [];
-  // List<Product> _products = [
-  //   Product(
-  //     id: 'p0',
-  //     title: 'Red Shirt',
-  //     description: 'A red shirt - it is pretty red!',
-  //     price: 29.99,
-  //     imageUrl:
-  //         'https://cdn.pixabay.com/photo/2016/10/02/22/17/red-t-shirt-1710578_1280.jpg',
-  //   ),
-  //   Product(
-  //     id: 'p1',
-  //     title: 'Trousers',
-  //     description: 'A nice pair of trousers.',
-  //     price: 59.99,
-  //     imageUrl:
-  //         'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e8/Trousers%2C_dress_%28AM_1960.022-8%29.jpg/512px-Trousers%2C_dress_%28AM_1960.022-8%29.jpg',
-  //   ),
-  //   Product(
-  //     id: 'p2',
-  //     title: 'Yellow Scarf',
-  //     description: 'Warm and cozy - exactly what you need for the winter.',
-  //     price: 19.99,
-  //     imageUrl:
-  //         'https://live.staticflickr.com/4043/4438260868_cc79b3369d_z.jpg',
-  //   ),
-  //   Product(
-  //     id: 'p3',
-  //     title: 'A Pan',
-  //     description: 'Prepare any meal you want.',
-  //     price: 49.99,
-  //     imageUrl:
-  //         'https://upload.wikimedia.org/wikipedia/commons/thumb/1/14/Cast-Iron-Pan.jpg/1024px-Cast-Iron-Pan.jpg',
-  //   ),
-  // ];
 
   List<Product> get favorites{
     return _products.where((prod){
@@ -114,17 +80,20 @@ class PProducts with ChangeNotifier{
       final response = await http.get(PProducts.prodsURL+".json");
       final products = json.decode(response.body) as Map<String, dynamic>;
 
-      products.forEach((key, value){
-        var newProd = Product(
-          id: key,
-          title: value['title'],
-          description: value['description'],
-          imageUrl: value['imageUrl'],
-          price: value['price'],
-          isFavorite: value['isFavorite'],
-        );
-        if(! this._products.contains(newProd)) this._products.add(newProd);
-      });
+      if(products == null){}  // no item was received
+      else{
+        products.forEach((key, value){
+          var newProd = Product(
+            id: key,
+            title: value['title'],
+            description: value['description'],
+            imageUrl: value['imageUrl'],
+            price: value['price'],
+            isFavorite: value['isFavorite'],
+          );
+          if(! this._products.contains(newProd)) this._products.add(newProd);
+        });
+      }
 
       notifyListeners();
     }catch(error){
@@ -150,8 +119,14 @@ class PProducts with ChangeNotifier{
     }
   }
 
-  void removeProduct(String id){
+  Future<void> removeProduct(String id) async{
     this._products.removeWhere((prod) => prod.id == id);
+
+    try{
+      await http.delete(PProducts.prodsURL+"/$id.json");
+    }catch(error){
+
+    }
 
     notifyListeners();
   }
