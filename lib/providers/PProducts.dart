@@ -1,6 +1,6 @@
 import 'package:flutter/foundation.dart';
-
-import 'package:flutter/foundation.dart';
+import 'package:http/http.dart' as http;
+import "dart:convert";
 
 class Product with ChangeNotifier{
   final String id;
@@ -23,6 +23,17 @@ class Product with ChangeNotifier{
     this.isFavorite = !this.isFavorite;
 
     notifyListeners();
+  }
+
+  Map<String, String> toMap(){
+    return {
+      'id': this.id,
+      'title': this.title,
+      'description': this.description,
+      'price': this.price.toStringAsFixed(2),
+      'imageUrl': this.imageUrl,
+      'isFavorite': this.isFavorite.toString(),
+    };
   }
 }
 
@@ -78,10 +89,17 @@ class PProducts with ChangeNotifier{
     });
   }
 
-  void addProduct(Product p){
-    this._products.add(p);
+  Future<void> addProduct(Product product) async{
+    this._products.add(product);
 
-    notifyListeners();  // avvisa che ci sono stati dei cambiamenti
+    try{
+      const url = "https://flutter-shop-6f582.firebaseio.com/products.json";
+      await http.post(url ,body: json.encode(product.toMap()));
+
+      notifyListeners();  // avvisa che ci sono stati dei cambiamenti
+    }catch(error){
+      throw error;
+    }
   }
 
   void removeProduct(String id){

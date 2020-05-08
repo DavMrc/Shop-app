@@ -14,6 +14,7 @@ class SNewProduct extends StatefulWidget {
 class _SNewProductState extends State<SNewProduct> {
   bool _isInit = true;
   bool _isEditMode = false;
+  bool _isLoading = false;
   final _priceFocusNode = FocusNode();
   final _descriptionFocusNode = FocusNode();
   final _imageURLController = TextEditingController();
@@ -87,13 +88,16 @@ class _SNewProductState extends State<SNewProduct> {
     }
   }
 
-  void _saveForm(BuildContext ctx){
+  void _saveForm(BuildContext ctx) async{
     bool isValid = this._formKey.currentState.validate();
     if(! isValid) return;
 
     this._formKey.currentState.save();  // triggers every input.onSaved method
     var productProvider = Provider.of<PProducts>(ctx, listen: false);
 
+    setState(() {
+      this._isLoading = true;  // updates the UI showing a Spinner
+    });
     if(this._isEditMode){
       Product product = Product(
         id: this._tempProduct['id'],
@@ -104,6 +108,7 @@ class _SNewProductState extends State<SNewProduct> {
         isFavorite: this._tempProduct['favorite'],
       );
       productProvider.editProduct(product);
+      Navigator.of(context).pop();
     }
     else{
       Product product = Product(
@@ -113,7 +118,8 @@ class _SNewProductState extends State<SNewProduct> {
         price: double.parse(this._tempProduct['price']),
         title: this._tempProduct['title'],
       );
-      productProvider.addProduct(product);
+      await productProvider.addProduct(product);
+      Navigator.of(context).pop();
     }
   }
 
@@ -130,7 +136,9 @@ class _SNewProductState extends State<SNewProduct> {
         ],
       ),
 
-      body: Padding(
+      body: this._isLoading
+      ? Center(child: CircularProgressIndicator(),)
+      : Padding(
         padding: const EdgeInsets.all(20),
         child: Form(
           key: this._formKey,
