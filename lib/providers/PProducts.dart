@@ -25,53 +25,64 @@ class Product with ChangeNotifier{
     notifyListeners();
   }
 
-  Map<String, String> toMap(){
+  Map<String, dynamic> toMap(){
     return {
       'id': this.id,
       'title': this.title,
       'description': this.description,
-      'price': this.price.toStringAsFixed(2),
+      'price': this.price,
       'imageUrl': this.imageUrl,
-      'isFavorite': this.isFavorite.toString(),
+      'isFavorite': this.isFavorite,
     };
+  }
+
+  @override
+  int get hashCode => this.id.hashCode;
+
+  @override
+  bool operator ==(dynamic other){
+    return this.id == other.id;
   }
 }
 
 class PProducts with ChangeNotifier{
-  List<Product> _products = [
-    Product(
-      id: 'p0',
-      title: 'Red Shirt',
-      description: 'A red shirt - it is pretty red!',
-      price: 29.99,
-      imageUrl:
-          'https://cdn.pixabay.com/photo/2016/10/02/22/17/red-t-shirt-1710578_1280.jpg',
-    ),
-    Product(
-      id: 'p1',
-      title: 'Trousers',
-      description: 'A nice pair of trousers.',
-      price: 59.99,
-      imageUrl:
-          'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e8/Trousers%2C_dress_%28AM_1960.022-8%29.jpg/512px-Trousers%2C_dress_%28AM_1960.022-8%29.jpg',
-    ),
-    Product(
-      id: 'p2',
-      title: 'Yellow Scarf',
-      description: 'Warm and cozy - exactly what you need for the winter.',
-      price: 19.99,
-      imageUrl:
-          'https://live.staticflickr.com/4043/4438260868_cc79b3369d_z.jpg',
-    ),
-    Product(
-      id: 'p3',
-      title: 'A Pan',
-      description: 'Prepare any meal you want.',
-      price: 49.99,
-      imageUrl:
-          'https://upload.wikimedia.org/wikipedia/commons/thumb/1/14/Cast-Iron-Pan.jpg/1024px-Cast-Iron-Pan.jpg',
-    ),
-  ];
+  static const prodsURL = "https://flutter-shop-6f582.firebaseio.com/products.json";
+
+  List<Product> _products = [];
+  // List<Product> _products = [
+  //   Product(
+  //     id: 'p0',
+  //     title: 'Red Shirt',
+  //     description: 'A red shirt - it is pretty red!',
+  //     price: 29.99,
+  //     imageUrl:
+  //         'https://cdn.pixabay.com/photo/2016/10/02/22/17/red-t-shirt-1710578_1280.jpg',
+  //   ),
+  //   Product(
+  //     id: 'p1',
+  //     title: 'Trousers',
+  //     description: 'A nice pair of trousers.',
+  //     price: 59.99,
+  //     imageUrl:
+  //         'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e8/Trousers%2C_dress_%28AM_1960.022-8%29.jpg/512px-Trousers%2C_dress_%28AM_1960.022-8%29.jpg',
+  //   ),
+  //   Product(
+  //     id: 'p2',
+  //     title: 'Yellow Scarf',
+  //     description: 'Warm and cozy - exactly what you need for the winter.',
+  //     price: 19.99,
+  //     imageUrl:
+  //         'https://live.staticflickr.com/4043/4438260868_cc79b3369d_z.jpg',
+  //   ),
+  //   Product(
+  //     id: 'p3',
+  //     title: 'A Pan',
+  //     description: 'Prepare any meal you want.',
+  //     price: 49.99,
+  //     imageUrl:
+  //         'https://upload.wikimedia.org/wikipedia/commons/thumb/1/14/Cast-Iron-Pan.jpg/1024px-Cast-Iron-Pan.jpg',
+  //   ),
+  // ];
 
   List<Product> get favorites{
     return _products.where((prod){
@@ -81,6 +92,29 @@ class PProducts with ChangeNotifier{
 
   List<Product> get all{
     return [..._products];  // ritorna una copia, NON l'oggetto stesso
+  }
+
+  Future<void> fetchProducts() async{
+    try{
+      final response = await http.get(PProducts.prodsURL);
+      final products = json.decode(response.body) as Map<String, dynamic>;
+
+      products.forEach((key, value){
+        var newProd = Product(
+          id: value['id'],
+          title: value['title'],
+          description: value['description'],
+          imageUrl: value['imageUrl'],
+          price: value['price'],
+          isFavorite: value['isFavorite'],
+        );
+        if(! this._products.contains(newProd)) this._products.add(newProd);
+      });
+
+      notifyListeners();
+    }catch(error){
+      throw error;
+    }
   }
 
   Product findById(String id){
@@ -93,8 +127,7 @@ class PProducts with ChangeNotifier{
     this._products.add(product);
 
     try{
-      const url = "https://flutter-shop-6f582.firebaseio.com/products.json";
-      await http.post(url ,body: json.encode(product.toMap()));
+      await http.post(PProducts.prodsURL, body: json.encode(product.toMap()));
 
       notifyListeners();  // avvisa che ci sono stati dei cambiamenti
     }catch(error){

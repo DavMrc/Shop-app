@@ -18,7 +18,22 @@ class SProducts extends StatefulWidget {
 }
 
 class _SProductsState extends State<SProducts> {
+  bool _isLoading = false;
   bool _showFavorites = false;
+
+  @override
+  void initState() {
+    setState(() {
+      this._isLoading = true;
+    });
+    Provider.of<PProducts>(context, listen: false).fetchProducts().then((_){
+      setState(() {
+        this._isLoading = false;
+      });
+    });
+
+    super.initState();
+  }
 
   void showFavorites(){
     setState(() {
@@ -74,7 +89,7 @@ class _SProductsState extends State<SProducts> {
       
       drawer: WDrawer(),
 
-      body: ProductsGrid(this._showFavorites),
+      body: this._isLoading ? Center(child: CircularProgressIndicator(),) : ProductsGrid(this._showFavorites),
     );
   }
 }
@@ -87,7 +102,7 @@ class ProductsGrid extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    List<Product> products;
+    List<Product> products = [];
 
     if(this.showFavorites){
       products = Provider.of<PProducts>(context).favorites;
