@@ -26,7 +26,7 @@ class _SNewProductState extends State<SNewProduct> {
     'description': '',
     'price': '-1',
     'imageUrl': '',
-    'favorite': false,
+    'isFavorite': false,
   };
 
   @override
@@ -48,7 +48,7 @@ class _SNewProductState extends State<SNewProduct> {
         this._tempProduct['title'] = product.title;
         this._tempProduct['description'] = product.description;
         this._tempProduct['price'] = product.price.toStringAsFixed(2);
-        this._tempProduct['favorite'] = product.isFavorite;
+        this._tempProduct['isFavorite'] = product.isFavorite;
         this._imageURLController.text = product.imageUrl;
       }
     }
@@ -99,26 +99,19 @@ class _SNewProductState extends State<SNewProduct> {
       this._isLoading = true;  // updates the UI showing a Spinner
     });
     if(this._isEditMode){
-      Product product = Product(
-        id: this._tempProduct['id'],
-        description: this._tempProduct['description'],
-        imageUrl: this._tempProduct['imageUrl'],
-        price: double.parse(this._tempProduct['price']),
-        title: this._tempProduct['title'],
-        isFavorite: this._tempProduct['favorite'],
-      );
-      productProvider.editProduct(product);
+      var product = {
+        'id': this._tempProduct['id'],
+        'description': this._tempProduct['description'],
+        'imageUrl': this._tempProduct['imageUrl'],
+        'price': this._tempProduct['price'],
+        'title': this._tempProduct['title'],
+        'isFavorite': this._tempProduct['isFavorite'],
+      };
+      await productProvider.editProduct(product);
       Navigator.of(context).pop();
     }
     else{
-      Product product = Product(
-        id: "p${productProvider.all.length}",
-        description: this._tempProduct['description'],
-        imageUrl: this._tempProduct['imageUrl'],
-        price: double.parse(this._tempProduct['price']),
-        title: this._tempProduct['title'],
-      );
-      await productProvider.addProduct(product);
+      await productProvider.addProduct(this._tempProduct);
       Navigator.of(context).pop();
     }
   }
@@ -161,7 +154,7 @@ class _SNewProductState extends State<SNewProduct> {
                   textInputAction: TextInputAction.next,
                   focusNode: this._priceFocusNode,
                   onFieldSubmitted: (_) => FocusScope.of(context).requestFocus(this._descriptionFocusNode),
-                  onSaved: (value) => this._tempProduct['price'] = value,
+                  onSaved: (value) => this._tempProduct['price'] = double.parse(value),
                   validator: (value) => this._validateInput(value, 'price'),
                 ),
 
@@ -204,7 +197,6 @@ class _SNewProductState extends State<SNewProduct> {
                           textInputAction: TextInputAction.done,
                           controller: this._imageURLController,
                           focusNode: this._imageURLFocusNode,
-                          // onFieldSubmitted: (_) => this._saveForm(context),
                           onSaved: (value) => this._tempProduct['imageUrl'] = value,
                           validator: (value) => this._validateInput(value, 'imageUrl'),
                         ),

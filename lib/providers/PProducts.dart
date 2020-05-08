@@ -19,6 +19,21 @@ class Product with ChangeNotifier{
     this.isFavorite = false,
   });
 
+  static Product fromMap(Map<String, dynamic> product){
+    try{
+      return Product(
+        id: product['id'],
+        description: product['description'],
+        imageUrl: product['imageUrl'],
+        price: product['price'],
+        title: product['title'],
+        isFavorite: product['isFavorite'] == null ? product['isFavorite'] : false,
+      );
+    }catch(error){
+      throw error;
+    }
+  }
+
   void toggleFavorite(){
     this.isFavorite = !this.isFavorite;
 
@@ -46,7 +61,7 @@ class Product with ChangeNotifier{
 }
 
 class PProducts with ChangeNotifier{
-  static const prodsURL = "https://flutter-shop-6f582.firebaseio.com/products.json";
+  static const prodsURL = "https://flutter-shop-6f582.firebaseio.com/products";
 
   List<Product> _products = [];
   // List<Product> _products = [
@@ -96,12 +111,12 @@ class PProducts with ChangeNotifier{
 
   Future<void> fetchProducts() async{
     try{
-      final response = await http.get(PProducts.prodsURL);
+      final response = await http.get(PProducts.prodsURL+".json");
       final products = json.decode(response.body) as Map<String, dynamic>;
 
       products.forEach((key, value){
         var newProd = Product(
-          id: value['id'],
+          id: key,
           title: value['title'],
           description: value['description'],
           imageUrl: value['imageUrl'],
@@ -123,11 +138,11 @@ class PProducts with ChangeNotifier{
     });
   }
 
-  Future<void> addProduct(Product product) async{
-    this._products.add(product);
-
+  Future<void> addProduct(Map<String, dynamic> product) async{
     try{
-      await http.post(PProducts.prodsURL, body: json.encode(product.toMap()));
+      final response = await http.post(PProducts.prodsURL+".json", body: json.encode(product));
+      product['id'] = json.decode(response.body)['name'];
+      this._products.add(Product.fromMap(product));
 
       notifyListeners();  // avvisa che ci sono stati dei cambiamenti
     }catch(error){
@@ -141,9 +156,15 @@ class PProducts with ChangeNotifier{
     notifyListeners();
   }
 
-  void editProduct(Product product){
-    final prodIndex = this._products.indexWhere((p) => p.id == product.id);
-    this._products[prodIndex] = product;
+  Future<void> editProduct(Map<String, dynamic> product) async{
+    final prodIndex = this._products.indexWhere((p) => p.id == product['id']);
+    this._products[prodIndex] = Product.fromMap(product);
+
+    try{
+      await http.patch(PProducts.prodsURL+"/${product['id']}.json", body: json.encode(product));
+    }catch(error){
+      throw error;
+    }
 
     notifyListeners();
   }
