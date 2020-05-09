@@ -11,14 +11,18 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiProvider(    
     providers: [
-      ChangeNotifierProvider(  // products provider registered
+      // TODO: these might become ChangeNotifierProvider.value()
+      ChangeNotifierProvider(  // products provider
         create: (ctx) => PProducts(),
       ),
-      ChangeNotifierProvider(  // cart provider registered
+      ChangeNotifierProvider(  // cart provider
         create: (ctx) => PCart(),
       ),
-      ChangeNotifierProvider(
+      ChangeNotifierProvider( // orders provider
         create: (_) => POrders(),
+      ),
+      ChangeNotifierProvider(
+        create: (_) => PAuth(),
       )
     ],  
       child: MaterialApp(
@@ -29,7 +33,8 @@ class MyApp extends StatelessWidget {
           fontFamily: "Lato",
         ),
         routes: {
-          '/': (_) => SProducts(),
+          // '/': (_) => SProducts(),
+          '/': (_) => SAuthScreen(),
           SProductDetail.routeName: (_) => SProductDetail(),
           SCart.routeName: (_) => SCart(),
           SOrders.routeName: (_) => SOrders(),
