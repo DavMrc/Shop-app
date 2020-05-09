@@ -56,13 +56,13 @@ class Product with ChangeNotifier{
     };
   }
 
-  Future<void> toggleFavorite(String token) async {
+  Future<void> toggleFavorite(String token, String userId) async {
     this.isFavorite = !this.isFavorite;
 
     try{
-      await http.patch(
-        PProducts.baseURL+'/${this.id}.json?auth=$token',
-        body: json.encode(this.toMap(noId: true))
+      await http.put(
+        'https://flutter-shop-6f582.firebaseio.com/favorites/$userId/${this.id}.json?auth=$token',
+        body: json.encode(this.isFavorite)
       );
     }catch(error){
       throw error;
@@ -84,11 +84,10 @@ class Product with ChangeNotifier{
 class PProducts with ChangeNotifier{
   static const baseURL = "https://flutter-shop-6f582.firebaseio.com/products";
   final _authToken;
+  final _userId;
   List<Product> _products = [];
 
-  PProducts(this._authToken, dynamic products){
-    products == null ? this._products = [] : this._products = products;
-  }
+  PProducts(this._userId, this._authToken, this._products);
 
   List<Product> get favorites{
     return _products.where((prod){
@@ -97,7 +96,8 @@ class PProducts with ChangeNotifier{
   }  
 
   List<Product> get all{
-    return [..._products];  // ritorna una copia, NON l'oggetto stesso
+    if (this._products.isEmpty) return [];
+    return [...this._products];  // ritorna una copia, NON l'oggetto stesso
   }
 
   Future<void> fetchProducts() async{
@@ -107,6 +107,11 @@ class PProducts with ChangeNotifier{
 
       if(products == null){}  // no item was received
       else{
+        final favoritesResponse = await http.get(
+          'https://flutter-shop-6f582.firebaseio.com/favorites/${this._userId}.json?auth=${this._authToken}',
+        );
+        final favoriteData = json.decode(favoritesResponse.body);
+
         products.forEach((key, value){
           var newProd = Product(
             id: key,
@@ -114,7 +119,7 @@ class PProducts with ChangeNotifier{
             description: value['description'],
             imageUrl: value['imageUrl'],
             price: value['price'],
-            isFavorite: value['isFavorite'],
+            isFavorite: favoriteData == null ? false : favoriteData[key] ?? false,
           );
           if(! this._products.contains(newProd)) this._products.add(newProd);
         });

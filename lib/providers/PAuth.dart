@@ -24,6 +24,10 @@ class PAuth with ChangeNotifier{
     return null;
   }
 
+  String get userId{
+    return _userId;
+  }
+
   Future<void> _auth(String email, String pwd, String service) async {
     final url = "https://identitytoolkit.googleapis.com/v1/accounts:$service?key=$api_key";
 

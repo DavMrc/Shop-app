@@ -23,9 +23,8 @@ class _SNewProductState extends State<SNewProduct> {
   var _tempProduct = {
     'title': '',
     'description': '',
-    'price': '-1',
+    'price': -1,
     'imageUrl': '',
-    'isFavorite': false,
   };
 
   @override
@@ -46,7 +45,6 @@ class _SNewProductState extends State<SNewProduct> {
         this._tempProduct['title'] = product.title;
         this._tempProduct['description'] = product.description;
         this._tempProduct['price'] = product.price.toStringAsFixed(2);
-        this._tempProduct['isFavorite'] = product.isFavorite;
         this._imageURLController.text = product.imageUrl;
       }
     }
@@ -140,7 +138,7 @@ class _SNewProductState extends State<SNewProduct> {
                 ),
 
                 TextFormField(
-                  initialValue: this._tempProduct['price'] != '-1' ? this._tempProduct['price'] : '',
+                  initialValue: this._tempProduct['price'] != -1 ? this._tempProduct['price'] : '',
                   decoration: InputDecoration(labelText: "Price",),
                   keyboardType: TextInputType.number,
                   textInputAction: TextInputAction.next,
