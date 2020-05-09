@@ -34,13 +34,17 @@ class Product with ChangeNotifier{
     }
   }
 
-  void toggleFavorite(){
-    this.isFavorite = !this.isFavorite;
+  Map<String, dynamic> toMap({noId:false}){
+    if(noId){
+      return {
+        'title': this.title,
+        'description': this.description,
+        'price': this.price,
+        'imageUrl': this.imageUrl,
+        'isFavorite': this.isFavorite,
+      };
+    }
 
-    notifyListeners();
-  }
-
-  Map<String, dynamic> toMap(){
     return {
       'id': this.id,
       'title': this.title,
@@ -49,6 +53,18 @@ class Product with ChangeNotifier{
       'imageUrl': this.imageUrl,
       'isFavorite': this.isFavorite,
     };
+  }
+
+  Future<void> toggleFavorite() async {
+    this.isFavorite = !this.isFavorite;
+
+    try{
+      await http.patch(PProducts.prodsURL+'/${this.id}.json', body: json.encode(this.toMap(noId: true)));
+    }catch(error){
+      throw error;
+    }
+
+    notifyListeners();
   }
 
   @override
