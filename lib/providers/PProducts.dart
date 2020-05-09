@@ -56,11 +56,14 @@ class Product with ChangeNotifier{
     };
   }
 
-  Future<void> toggleFavorite() async {
+  Future<void> toggleFavorite(String token) async {
     this.isFavorite = !this.isFavorite;
 
     try{
-      await http.patch(PProducts.baseURL+'/${this.id}.json', body: json.encode(this.toMap(noId: true)));
+      await http.patch(
+        PProducts.baseURL+'/${this.id}.json?auth=$token',
+        body: json.encode(this.toMap(noId: true))
+      );
     }catch(error){
       throw error;
     }
@@ -80,8 +83,12 @@ class Product with ChangeNotifier{
 
 class PProducts with ChangeNotifier{
   static const baseURL = "https://flutter-shop-6f582.firebaseio.com/products";
-
+  final _authToken;
   List<Product> _products = [];
+
+  PProducts(this._authToken, dynamic products){
+    products == null ? this._products = [] : this._products = products;
+  }
 
   List<Product> get favorites{
     return _products.where((prod){
@@ -95,7 +102,7 @@ class PProducts with ChangeNotifier{
 
   Future<void> fetchProducts() async{
     try{
-      final response = await http.get(PProducts.baseURL+".json");
+      final response = await http.get(PProducts.baseURL+".json?auth=${this._authToken})}");
       final products = json.decode(response.body) as Map<String, dynamic>;
 
       if(products == null){}  // no item was received
@@ -127,7 +134,10 @@ class PProducts with ChangeNotifier{
 
   Future<void> addProduct(Map<String, dynamic> product) async{
     try{
-      final response = await http.post(PProducts.baseURL+".json", body: json.encode(product));
+      final response = await http.post(
+        PProducts.baseURL+".json?auth=${this._authToken}",
+        body: json.encode(product)
+      );
       product['id'] = json.decode(response.body)['name'];
       this._products.add(Product.fromMap(product));
 
@@ -141,7 +151,7 @@ class PProducts with ChangeNotifier{
     this._products.removeWhere((prod) => prod.id == id);
 
     try{
-      await http.delete(PProducts.baseURL+"/$id.json");
+      await http.delete(PProducts.baseURL+"/$id.json?auth=${this._authToken}");
     }catch(error){
 
     }
@@ -154,7 +164,7 @@ class PProducts with ChangeNotifier{
     this._products[prodIndex] = Product.fromMap(product);
 
     try{
-      await http.patch(PProducts.baseURL+"/$id.json", body: json.encode(product));
+      await http.patch(PProducts.baseURL+"/$id.json?auth=${this._authToken}", body: json.encode(product));
     }catch(error){
       throw error;
     }

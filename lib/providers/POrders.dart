@@ -55,8 +55,13 @@ class OrderItem{
 
 
 class POrders with ChangeNotifier{
-  List<OrderItem> _orders = [];
   static const baseURL = "https://flutter-shop-6f582.firebaseio.com/orders";
+  List<OrderItem> _orders;
+  final String _token;
+
+  POrders(this._token, dynamic orders){
+    orders == null ? this._orders = [] : this._orders = orders;
+  }
 
   List<OrderItem> get orders {
     return [...this._orders];
@@ -76,7 +81,7 @@ class POrders with ChangeNotifier{
 
     try{
       final response = await http.post(
-        POrders.baseURL+'.json',
+        POrders.baseURL+'.json?auth=${this._token}',
         body: json.encode(orderMap)
       );
       orderMap['id'] = json.decode(response.body)['name'];
@@ -91,7 +96,7 @@ class POrders with ChangeNotifier{
 
   Future<void> fetchOrders() async {
     try{
-      final response = await http.get(POrders.baseURL+'.json');
+      final response = await http.get(POrders.baseURL+'.json?auth=${this._token}');
       final orders = json.decode(response.body) as Map<String, dynamic>;
 
       if (orders == null) return;  // no orders to be fetched

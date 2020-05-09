@@ -10,6 +10,20 @@ class PAuth with ChangeNotifier{
   DateTime _expiryDate;
   String _userId;
 
+  bool get isAuth{
+    return this.token != null;
+  }
+
+  String get token{
+    if(this._expiryDate != null &&
+      this._token != null &&
+      _expiryDate.isAfter(DateTime.now())
+    ){
+      return this._token;
+    }
+    return null;
+  }
+
   Future<void> _auth(String email, String pwd, String service) async {
     final url = "https://identitytoolkit.googleapis.com/v1/accounts:$service?key=$api_key";
 
@@ -24,7 +38,13 @@ class PAuth with ChangeNotifier{
       throw HttpException(responseBody['error']['message']);
     }
 
-    print(responseBody);
+    this._token = responseBody['idToken'];
+    this._userId = responseBody['localId'];
+    this._expiryDate = DateTime.now().add(
+      Duration(seconds: int.parse(responseBody['expiresIn']))
+    );
+
+    notifyListeners();
   }
 
   Future<void> signup(String email, String pwd) async {

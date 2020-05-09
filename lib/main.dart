@@ -9,38 +9,42 @@ void main() => runApp(MyApp());
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return MultiProvider(    
+    return MultiProvider(
+    // TODO: these might become ChangeNotifierProvider.value()
     providers: [
-      // TODO: these might become ChangeNotifierProvider.value()
-      ChangeNotifierProvider(  // products provider
-        create: (ctx) => PProducts(),
+      ChangeNotifierProvider(
+        create: (_) => PAuth(),
+      ),
+      ChangeNotifierProxyProvider<PAuth, PProducts>(  // products provider, depends on PAuth
+        update: (_, auth, previousProducts) => PProducts(auth.token, previousProducts.all),
+        create: (_) => null,
+      ),
+      ChangeNotifierProxyProvider<PAuth, POrders>( // orders provider
+        update: (_, auth, previousOrders) => POrders(auth.token, previousOrders.orders),
+        create: (_) => null,
       ),
       ChangeNotifierProvider(  // cart provider
         create: (ctx) => PCart(),
       ),
-      ChangeNotifierProvider( // orders provider
-        create: (_) => POrders(),
-      ),
-      ChangeNotifierProvider(
-        create: (_) => PAuth(),
-      )
     ],  
-      child: MaterialApp(
-        title: 'MyShop',
-        theme: ThemeData(
-          primarySwatch: Colors.purple,
-          accentColor: Colors.deepOrange,
-          fontFamily: "Lato",
+      child: Consumer<PAuth>(
+        builder: (_, auth, __) => MaterialApp(
+          title: 'MyShop',
+          theme: ThemeData(
+            primarySwatch: Colors.purple,
+            accentColor: Colors.deepOrange,
+            fontFamily: "Lato",
+          ),
+          routes: {
+            // '/': (_) => SProducts(),
+            '/': (_) => auth.isAuth ? SProducts() : SAuthScreen(),
+            SProductDetail.routeName: (_) => SProductDetail(),
+            SCart.routeName: (_) => SCart(),
+            SOrders.routeName: (_) => SOrders(),
+            SUserProducts.routeName: (_) => SUserProducts(),
+            SNewProduct.routeName: (_) => SNewProduct(),
+          },
         ),
-        routes: {
-          // '/': (_) => SProducts(),
-          '/': (_) => SAuthScreen(),
-          SProductDetail.routeName: (_) => SProductDetail(),
-          SCart.routeName: (_) => SCart(),
-          SOrders.routeName: (_) => SOrders(),
-          SUserProducts.routeName: (_) => SUserProducts(),
-          SNewProduct.routeName: (_) => SNewProduct(),
-        },
       ),
     );
   }
