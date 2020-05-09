@@ -122,7 +122,7 @@ class _SNewProductState extends State<SNewProduct> {
       ),
 
       body: this._isLoading
-      ? Center(child: CircularProgressIndicator(),)
+      ? Center(child: CircularProgressIndicator(),)  // spinner
       : Padding(
         padding: const EdgeInsets.all(20),
         child: Form(

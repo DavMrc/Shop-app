@@ -14,8 +14,27 @@ class CartItem{
     this.quantity = 1,
   });
 
+  static CartItem fromMap(Map<String, dynamic> map){
+    return CartItem(
+      id: map['id'],
+      price: map['price'],
+      title: map['title'],
+      quantity: map['quantitiy'],
+    );
+  }
+
+  @override
   String toString() {
     return "CartItem #"+this.id;
+  }
+
+  Map<String, dynamic> toJson(){
+    return {
+      'id': this.id,
+      'title': this.title,
+      'price': this.price,
+      'quantity': this.quantity,
+    };
   }
 }
 
@@ -25,22 +44,6 @@ class PCart with ChangeNotifier{
 
   Map<String, CartItem> get items{
     return {..._items};
-  }
-
-  void addItem(String _id, String _title, double _price){
-    if(this._items.containsKey(_id)){
-      this._items[_id].quantity ++;
-    }else{
-      var newItem =  CartItem(
-        id: _id,
-        title:  _title,
-        price: _price,
-        quantity: 1,
-      );
-      this._items[_id] = newItem;
-    }
-
-    notifyListeners();
   }
 
   int get itemCount{
@@ -61,6 +64,22 @@ class PCart with ChangeNotifier{
     });
 
     return total;
+  }
+
+  void addItem(String _id, String _title, double _price){
+    if(this._items.containsKey(_id)){
+      this._items[_id].quantity ++;
+    }else{
+      var newItem =  CartItem(
+        id: _id,
+        title:  _title,
+        price: _price,
+        quantity: 1,
+      );
+      this._items[_id] = newItem;
+    }
+
+    notifyListeners();
   }
 
   void removeItem(String productId, {int quantity=-1}){
