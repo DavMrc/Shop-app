@@ -131,12 +131,12 @@ class PProducts with ChangeNotifier{
     notifyListeners();
   }
 
-  Future<void> editProduct(Map<String, dynamic> product) async{
-    final prodIndex = this._products.indexWhere((p) => p.id == product['id']);
+  Future<void> editProduct(String id, Map<String, dynamic> product) async{
+    final prodIndex = this._products.indexWhere((p) => p.id == id);
     this._products[prodIndex] = Product.fromMap(product);
 
     try{
-      await http.patch(PProducts.prodsURL+"/${product['id']}.json", body: json.encode(product));
+      await http.patch(PProducts.prodsURL+"/$id.json", body: json.encode(product));
     }catch(error){
       throw error;
     }

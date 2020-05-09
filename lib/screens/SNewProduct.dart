@@ -21,7 +21,6 @@ class _SNewProductState extends State<SNewProduct> {
   final _imageURLFocusNode = FocusNode();
   final _formKey = GlobalKey<FormState>();
   var _tempProduct = {
-    'id': '',
     'title': '',
     'description': '',
     'price': '-1',
@@ -44,7 +43,6 @@ class _SNewProductState extends State<SNewProduct> {
         this._isEditMode = true;
         Product product = Provider.of<PProducts>(context).findById(editProductId);
 
-        this._tempProduct['id'] = product.id;
         this._tempProduct['title'] = product.title;
         this._tempProduct['description'] = product.description;
         this._tempProduct['price'] = product.price.toStringAsFixed(2);
@@ -98,16 +96,10 @@ class _SNewProductState extends State<SNewProduct> {
     setState(() {
       this._isLoading = true;  // updates the UI showing a Spinner
     });
+
     if(this._isEditMode){
-      var product = {
-        'id': this._tempProduct['id'],
-        'description': this._tempProduct['description'],
-        'imageUrl': this._tempProduct['imageUrl'],
-        'price': this._tempProduct['price'],
-        'title': this._tempProduct['title'],
-        'isFavorite': this._tempProduct['isFavorite'],
-      };
-      await productProvider.editProduct(product);
+      String id = ModalRoute.of(context).settings.arguments;
+      await productProvider.editProduct(id, this._tempProduct);
       Navigator.of(context).pop();
     }
     else{
