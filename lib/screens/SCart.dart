@@ -1,5 +1,3 @@
-import 'dart:ffi';
-
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -8,6 +6,28 @@ import '../providers/providers.dart';
 
 class SCart extends StatelessWidget {
   static const routeName = "/cart";
+
+  void submitOrder(BuildContext ctx, PCart cartProvider){
+    if(cartProvider.items.values.toList().isEmpty){
+      showDialog(
+        context: ctx,
+        builder: (_) => AlertDialog(
+          title: Text("Cart empty!"),
+          content: Text("You submitted an empty order! Add some products first!"),
+          actions: <Widget>[
+            FlatButton(child: Text("Okay"), onPressed: () => Navigator.of(ctx).pop(),)
+          ],
+        )
+      );
+    }
+    else{
+      Provider.of<POrders>(ctx, listen: false).addOrder(
+        cartProvider.items.values.toList()
+      );
+
+      cartProvider.clear();
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -31,7 +51,7 @@ class SCart extends StatelessWidget {
                   Chip(
                     label: Text(
                       "${cartProvider.totalPrice}€",
-                      style: Theme.of(context).primaryTextTheme.title,
+                      style: Theme.of(context).primaryTextTheme.headline6,
                     ),
                     backgroundColor: Theme.of(context).primaryColor,
                   ),
@@ -39,13 +59,7 @@ class SCart extends StatelessWidget {
                   FlatButton(
                     child: Text("Order now"),
                     textColor: Theme.of(context).primaryColor,
-                    onPressed: () {
-                      Provider.of<POrders>(context, listen: false).addOrder(
-                        cartProvider.items.values.toList()
-                      );
-
-                      cartProvider.clear();
-                    },
+                    onPressed: () => this.submitOrder(context, cartProvider),
                   ),
                 ],
               ),
