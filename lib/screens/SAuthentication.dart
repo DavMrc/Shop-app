@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'dart:math';
@@ -106,6 +107,19 @@ class _AuthCardState extends State<AuthCard> {
   final _passwordController = TextEditingController();
 
 
+  void _showError(String msg){
+    showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: Text("An error occurred"),
+        content: Text(msg),
+        actions: <Widget>[
+          FlatButton(child: Text("Okay"), onPressed: () => Navigator.of(context).pop(),)
+        ],
+      ),
+    );
+  }
+
   Future<void> _submit() async {
     if (!_formKey.currentState.validate()) {
       // Invalid!
@@ -116,13 +130,33 @@ class _AuthCardState extends State<AuthCard> {
     setState(() {
       _isLoading = true;
     });
-    if (_authMode == AuthMode.Login) {
-      // Log user in
-    } else {
-      // Sign user up
-      await Provider.of<PAuth>(context, listen: false).signup(
-        this._authData['email'], this._authData['password'],
-      );
+
+    try{
+      if (_authMode == AuthMode.Login) {  // Log user in
+        await Provider.of<PAuth>(context, listen: false).login(
+          this._authData['email'], this._authData['password'],
+        );
+      } else {  // Sign user up
+        await Provider.of<PAuth>(context, listen: false).signup(
+          this._authData['email'], this._authData['password'],
+        );
+      }
+    }
+    on HttpException catch(error){
+      var errorMessage = "Authentication failed";
+
+      if (error.message.contains("EMAIL_EXISTS")) errorMessage = "This email address is already in use.";
+      if (error.message.contains("EMAIL_INVALID")) errorMessage = "This email address is invalid.";
+      if (error.message.contains("EMAIL_NOT_FOUND")) errorMessage = "There are no accounts registered to this email.";
+      if (error.message.contains("TOO_MANY_ATTEMPTS")) errorMessage = "You have made too many attempts. Try later.";
+      if (error.message.contains("WEAK_PASSWORD")) errorMessage = "This password is too weak.";
+      if (error.message.contains("INVALID_PASSWORD")) errorMessage = "This password is incorrect.";
+    
+      this._showError(errorMessage);
+    }
+    catch (error){
+      this._showError("Authentication failed");
+      print(error);
     }
 
     setState(() {
