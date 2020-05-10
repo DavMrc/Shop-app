@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'dart:io';
 
 import '../providers/providers.dart';
 import './SCart.dart';
@@ -19,35 +18,7 @@ class SProducts extends StatefulWidget {
 }
 
 class _SProductsState extends State<SProducts> {
-  bool _isLoading = false;
-  bool _isInit = true;
   bool _showFavorites = false;
-
-  // @override
-  // void initState() {
-  //   // if(! this.mounted) return;
-
-  //   setState(() {
-  //     this._isLoading = true;
-  //   });
-
-  //   Provider.of<PProducts>(context, listen: false).fetchProducts().then((_){
-  //     // while(! this.mounted) sleep(Duration(milliseconds: 100));
-  //     setState(() {
-  //       this._isLoading = false;
-  //     });
-  //   });
-
-  //   super.initState();
-  // }
-
-  // @override
-  // void didChangeDependencies() {
-  //   if(this._isInit){
-
-  //   }
-  //   super.didChangeDependencies();
-  // }
 
   void showFavorites(){
     setState(() {

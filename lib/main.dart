@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import './widgets/WSplashScreen.dart';
 import './screens/screens.dart';
 import './providers/providers.dart';
 
@@ -45,7 +46,19 @@ class MyApp extends StatelessWidget {
           ),
           routes: {
             // '/': (_) => SProducts(),
-            '/': (_) => auth.isAuth ? SProducts() : SAuthScreen(),
+            // '/': (_) => auth.isAuth ? SProducts() : SAuthScreen(),
+            '/': (_) => auth.isAuth
+            ? SProducts()
+            : FutureBuilder(
+              future: auth.tryAutoLogin(),
+              builder: (_, snapshot) {
+                if(snapshot.connectionState == ConnectionState.waiting){
+                  return WSplashScreen();
+                }else if(snapshot.connectionState == ConnectionState.done){
+                  return SAuthScreen();
+                }
+              },
+            ),
             SProductDetail.routeName: (_) => SProductDetail(),
             SCart.routeName: (_) => SCart(),
             SOrders.routeName: (_) => SOrders(),

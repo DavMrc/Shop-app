@@ -62,9 +62,35 @@ class PAuth with ChangeNotifier{
     await this._auth(email, pwd, 'signInWithPassword');
 
     this.autologout();
+
+    final userData = json.encode({
+      'token': this._token,
+      'userId': this._userId,
+      'expiryDate': this._expiryDate.toString(),
+    });
+    final prefs = await SharedPreferences.getInstance();
+    prefs.setString('userData', userData);
   }
 
-  void logout(){
+  Future<bool> tryAutoLogin() async {
+    final prefs = await SharedPreferences.getInstance();
+
+    if(! prefs.containsKey('userData')) return false;
+
+    final userData = json.decode(prefs.getString('userData')) as Map<String, dynamic>;
+    final expiryDate = DateTime.parse(userData['expiryDate']);
+
+    if(expiryDate.isBefore(DateTime.now())) return false;
+
+    this._token = userData['token'];
+    this._userId = userData['userId'];
+    this._expiryDate = expiryDate;
+
+    notifyListeners();
+    return true;
+  }
+
+  void logout() async {
     this._userId = null;
     this._token = null;
     this._expiryDate = null;
@@ -73,6 +99,9 @@ class PAuth with ChangeNotifier{
       this._expiryTimer.cancel();
       this._expiryTimer = null;
     }
+
+    final prefs = await SharedPreferences.getInstance();
+    prefs.clear();
 
     notifyListeners();
   }
