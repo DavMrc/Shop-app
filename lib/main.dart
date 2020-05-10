@@ -45,8 +45,6 @@ class MyApp extends StatelessWidget {
             fontFamily: "Lato",
           ),
           routes: {
-            // '/': (_) => SProducts(),
-            // '/': (_) => auth.isAuth ? SProducts() : SAuthScreen(),
             '/': (_) => auth.isAuth
             ? SProducts()
             : FutureBuilder(
