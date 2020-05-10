@@ -61,7 +61,7 @@ class Product with ChangeNotifier{
 
     try{
       await http.put(
-        'https://flutter-shop-6f582.firebaseio.com/favorites/$userId/${this.id}.json?auth=$token',
+        PProducts.baseURL+'/favorites/$userId/${this.id}.json?auth=$token',
         body: json.encode(this.isFavorite)
       );
     }catch(error){
@@ -81,8 +81,10 @@ class Product with ChangeNotifier{
 }
 
 
+// ----------------PRODUCTS PROVIDER
+
 class PProducts with ChangeNotifier{
-  static const baseURL = "https://flutter-shop-6f582.firebaseio.com/products";
+  static const baseURL = "https://flutter-shop-6f582.firebaseio.com";
   final _authToken;
   final _userId;
   List<Product> _products = [];
@@ -91,24 +93,30 @@ class PProducts with ChangeNotifier{
 
   List<Product> get favorites{
     return _products.where((prod){
-        return prod.isFavorite;
-      }).toList();
+      return prod.isFavorite;
+    }).toList();
   }  
 
   List<Product> get all{
     if (this._products.isEmpty) return [];
-    return [...this._products];  // ritorna una copia, NON l'oggetto stesso
+    return [...this._products];  // ritorna una copia
   }
 
-  Future<void> fetchProducts() async{
+  Future<void> fetchProducts({bool filterById: false}) async{
+    this._products.clear();
+
+    final filterQuery = filterById ? 'orderBy="creatorId"&equalTo="${this._userId}"' : '';
+    
     try{
-      final response = await http.get(PProducts.baseURL+".json?auth=${this._authToken})}");
-      final products = json.decode(response.body) as Map<String, dynamic>;
+      final productsResponse = await http.get(
+        baseURL+'/products.json?auth=${this._authToken}&$filterQuery'
+      );
+      final products = json.decode(productsResponse.body) as Map<String, dynamic>;
 
       if(products == null){}  // no item was received
       else{
         final favoritesResponse = await http.get(
-          'https://flutter-shop-6f582.firebaseio.com/favorites/${this._userId}.json?auth=${this._authToken}',
+          baseURL+'/favorites/${this._userId}.json?auth=${this._authToken}',
         );
         final favoriteData = json.decode(favoritesResponse.body);
 
@@ -121,7 +129,8 @@ class PProducts with ChangeNotifier{
             price: value['price'],
             isFavorite: favoriteData == null ? false : favoriteData[key] ?? false,
           );
-          if(! this._products.contains(newProd)) this._products.add(newProd);
+          this._products.add(newProd);
+          // if(! this._products.contains(newProd)) this._products.add(newProd);
         });
       }
 
@@ -140,13 +149,13 @@ class PProducts with ChangeNotifier{
   Future<void> addProduct(Map<String, dynamic> product) async{
     try{
       final response = await http.post(
-        PProducts.baseURL+".json?auth=${this._authToken}",
+        PProducts.baseURL+"/products.json?auth=${this._authToken}",
         body: json.encode(product)
       );
       product['id'] = json.decode(response.body)['name'];
       this._products.add(Product.fromMap(product));
 
-      notifyListeners();  // avvisa che ci sono stati dei cambiamenti
+      notifyListeners();
     }catch(error){
       throw error;
     }
@@ -156,7 +165,7 @@ class PProducts with ChangeNotifier{
     this._products.removeWhere((prod) => prod.id == id);
 
     try{
-      await http.delete(PProducts.baseURL+"/$id.json?auth=${this._authToken}");
+      await http.delete(PProducts.baseURL+"/products/$id.json?auth=${this._authToken}");
     }catch(error){
 
     }
@@ -169,7 +178,7 @@ class PProducts with ChangeNotifier{
     this._products[prodIndex] = Product.fromMap(product);
 
     try{
-      await http.patch(PProducts.baseURL+"/$id.json?auth=${this._authToken}", body: json.encode(product));
+      await http.patch(PProducts.baseURL+"/products/$id.json?auth=${this._authToken}", body: json.encode(product));
     }catch(error){
       throw error;
     }
