@@ -62,7 +62,7 @@ class SAuthScreen extends StatelessWidget {
                       child: Text(
                         'MyShop',
                         style: TextStyle(
-                          color: Theme.of(context).accentTextTheme.title.color,
+                          color: Theme.of(context).accentTextTheme.headline6.color,
                           fontSize: 50,
                           fontFamily: 'Anton',
                           fontWeight: FontWeight.normal,
@@ -197,6 +197,7 @@ class _AuthCardState extends State<AuthCard> {
               children: <Widget>[
                 TextFormField(
                   decoration: InputDecoration(labelText: 'E-Mail'),
+                  initialValue: "test@test.com",
                   keyboardType: TextInputType.emailAddress,
                   validator: (value) {
                     if (value.isEmpty || !value.contains('@')) {

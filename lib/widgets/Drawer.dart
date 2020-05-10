@@ -58,7 +58,6 @@ class WDrawer extends StatelessWidget {
             ),
             onTap: () {
               Provider.of<PAuth>(context, listen: false).logout();
-              Navigator.of(context).pushReplacementNamed('/');
             }
           ),
         ],

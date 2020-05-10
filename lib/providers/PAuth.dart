@@ -1,6 +1,8 @@
 import 'dart:io';
+import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
 
 const api_key = " AIzaSyDcCH9WjhtcBt7be0UHPM1UUZWMVl-fo98";
@@ -9,6 +11,7 @@ class PAuth with ChangeNotifier{
   String _token;
   DateTime _expiryDate;
   String _userId;
+  Timer _expiryTimer;
 
   bool get isAuth{
     return this.token != null;
@@ -52,16 +55,38 @@ class PAuth with ChangeNotifier{
   }
 
   Future<void> signup(String email, String pwd) async {
-    return this._auth(email, pwd, 'signUp');
+    await this._auth(email, pwd, 'signUp');
   }
 
   Future<void> login(String email, String pwd) async {
-    return this._auth(email, pwd, 'signInWithPassword');
+    await this._auth(email, pwd, 'signInWithPassword');
+
+    this.autologout();
   }
 
   void logout(){
     this._userId = null;
     this._token = null;
     this._expiryDate = null;
+
+    if(this._expiryTimer != null){
+      this._expiryTimer.cancel();
+      this._expiryTimer = null;
+    }
+
+    notifyListeners();
+  }
+
+  void autologout(){
+    if(this._expiryTimer != null){
+      this._expiryTimer.cancel();
+    }
+
+    final timeToExpiry = this._expiryDate.difference(DateTime.now()).inSeconds;
+
+    this._expiryTimer = Timer(
+      Duration(seconds: timeToExpiry),
+      this.logout
+    );
   }
 }

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'dart:io';
 
 import '../providers/providers.dart';
 import './SCart.dart';
@@ -19,21 +20,34 @@ class SProducts extends StatefulWidget {
 
 class _SProductsState extends State<SProducts> {
   bool _isLoading = false;
+  bool _isInit = true;
   bool _showFavorites = false;
 
-  @override
-  void initState() {
-    setState(() {
-      this._isLoading = true;
-    });
-    Provider.of<PProducts>(context, listen: false).fetchProducts().then((_){
-      setState(() {
-        this._isLoading = false;
-      });
-    });
+  // @override
+  // void initState() {
+  //   // if(! this.mounted) return;
 
-    super.initState();
-  }
+  //   setState(() {
+  //     this._isLoading = true;
+  //   });
+
+  //   Provider.of<PProducts>(context, listen: false).fetchProducts().then((_){
+  //     // while(! this.mounted) sleep(Duration(milliseconds: 100));
+  //     setState(() {
+  //       this._isLoading = false;
+  //     });
+  //   });
+
+  //   super.initState();
+  // }
+
+  // @override
+  // void didChangeDependencies() {
+  //   if(this._isInit){
+
+  //   }
+  //   super.didChangeDependencies();
+  // }
 
   void showFavorites(){
     setState(() {
@@ -89,7 +103,16 @@ class _SProductsState extends State<SProducts> {
       
       drawer: WDrawer(),
 
-      body: this._isLoading ? Center(child: CircularProgressIndicator(),) : ProductsGrid(this._showFavorites),
+      body: FutureBuilder(
+        future: Provider.of<PProducts>(context, listen: false).fetchProducts(),
+        builder: (_, snapshot){
+          if(snapshot.connectionState == ConnectionState.waiting){
+            return Center(child: CircularProgressIndicator(),);
+          }else if (snapshot.connectionState == ConnectionState.done){
+            return ProductsGrid(this._showFavorites);
+          }
+        },
+      ),
     );
   }
 }
@@ -105,9 +128,9 @@ class ProductsGrid extends StatelessWidget {
     List<Product> products = [];
 
     if(this.showFavorites){
-      products = Provider.of<PProducts>(context).favorites;
+      products = Provider.of<PProducts>(context, listen: false).favorites;
     }else{
-      products = Provider.of<PProducts>(context).all;
+      products = Provider.of<PProducts>(context, listen: false).all;
     }
 
     return GridView.builder(
