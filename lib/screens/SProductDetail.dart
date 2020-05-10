@@ -12,14 +12,14 @@ class SProductDetail extends StatelessWidget {
     Product product = Provider.of<PProducts>(context, listen: false).findById(id);
 
     return Scaffold(
-      appBar: AppBar(title: Text(product.title),),
-      body: SingleChildScrollView(
-        child: Column(
-          children: <Widget>[
-            Container(
-              height: 300,
-              width: double.infinity,
-              child: Hero(
+      body: CustomScrollView( 
+        slivers: [
+          SliverAppBar(
+            expandedHeight: 300,
+            pinned: true,
+            flexibleSpace: FlexibleSpaceBar(
+              title: Text(product.title,),
+              background: Hero(
                 tag: product.id,
                 child: Image.network(
                   product.imageUrl,
@@ -27,32 +27,38 @@ class SProductDetail extends StatelessWidget {
                 ),
               ),
             ),
+          ),
 
-            SizedBox(height: 10,),
+          SliverList(
+            delegate: SliverChildListDelegate([
+              SizedBox(height: 10,),
 
-            Text(
-              "${product.price.toStringAsFixed(2)}€",
-              style: TextStyle(
-                fontSize: 20,
-                color: Colors.grey,
-              ),
-            ),
-
-            SizedBox(height: 10,),
-
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 15),
-              width: double.infinity,
-              child: Text(
-                product.description,
-                softWrap: true,
+              Text(
+                "${product.price.toStringAsFixed(2)}€",
+                style: TextStyle(
+                  fontSize: 20,
+                  color: Colors.grey,
+                ),
                 textAlign: TextAlign.center,
-                style: TextStyle(fontSize: 18),
               ),
-            ),
-            
-          ],
-        ),
+
+              SizedBox(height: 10,),
+
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 15),
+                width: double.infinity,
+                child: Text(
+                  product.description,
+                  softWrap: true,
+                  textAlign: TextAlign.center,
+                  style: TextStyle(fontSize: 18),
+                ),
+              ),
+
+              SizedBox(height: 800,),
+            ]),
+          ),
+        ],
       ),
     );
   }
