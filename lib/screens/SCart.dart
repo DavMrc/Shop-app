@@ -50,7 +50,7 @@ class SCart extends StatelessWidget {
 
                   Chip(
                     label: Text(
-                      "${cartProvider.totalPrice}€",
+                      "${cartProvider.totalPrice.toStringAsFixed(2)}€",
                       style: Theme.of(context).primaryTextTheme.headline6,
                     ),
                     backgroundColor: Theme.of(context).primaryColor,

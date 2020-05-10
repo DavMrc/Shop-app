@@ -58,4 +58,10 @@ class PAuth with ChangeNotifier{
   Future<void> login(String email, String pwd) async {
     return this._auth(email, pwd, 'signInWithPassword');
   }
+
+  void logout(){
+    this._userId = null;
+    this._token = null;
+    this._expiryDate = null;
+  }
 }
