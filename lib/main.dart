@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import './helpers/custom_route.dart';
 import './widgets/WSplashScreen.dart';
 import './screens/screens.dart';
 import './providers/providers.dart';
@@ -43,6 +44,10 @@ class MyApp extends StatelessWidget {
             primarySwatch: Colors.purple,
             accentColor: Colors.deepOrange,
             fontFamily: "Lato",
+            pageTransitionsTheme: PageTransitionsTheme(builders: {
+              TargetPlatform.android: CustomPageTransition(),
+              TargetPlatform.iOS: CustomPageTransition(),
+            }),
           ),
           routes: {
             '/': (_) => auth.isAuth

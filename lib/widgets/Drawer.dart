@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../helpers/custom_route.dart';
 import '../screens/screens.dart';
 import '../providers/PAuth.dart';
 
@@ -20,6 +21,9 @@ class WDrawer extends StatelessWidget {
           ListTile(
             leading: Icon(Icons.shop),
             title: Text("Shop"),
+            // CUSTOM ROUTE TRANSITION ANIMATION
+            // onTap: () => Navigator.of(context).pushReplacement(
+              // CustomRoute(builder: (_) => SProducts())
             onTap: () => Navigator.of(context).pushReplacementNamed('/'),
           ),
 
