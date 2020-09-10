@@ -5,7 +5,8 @@ import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
 
-const api_key = " AIzaSyDcCH9WjhtcBt7be0UHPM1UUZWMVl-fo98";
+// firebase authentication - personal key
+String api_key = File("./lib/providers/api_key.txt").readAsStringSync();
 
 class PAuth with ChangeNotifier{
   String _token;
